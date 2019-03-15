@@ -11,19 +11,19 @@ namespace csharp
         [Test]
         public void ThirtyDays()
         {
-            var lines = File.ReadAllLines("ThirtyDays.txt");
+            var expectedLines = File.ReadAllLines("ThirtyDays.txt");
 
             StringBuilder fakeoutput = new StringBuilder();
             Console.SetOut(new StringWriter(fakeoutput));
-            Console.SetIn(new StringReader("a\n"));
+            Console.SetIn(new StringReader(""));
 
             Program.Main(new string[] { });
             String output = fakeoutput.ToString();
 
-            var outputLines = output.Split('\n');
-            for(var i = 0; i<Math.Min(lines.Length, outputLines.Length); i++) 
+            var actualLines = output.Split(new[] { "\r\n", "\r", "\n"}, StringSplitOptions.None);
+            for(var i = 0; i<Math.Min(expectedLines.Length, actualLines.Length); i++) 
             {
-                Assert.AreEqual(lines[i], outputLines[i]);
+                Assert.AreEqual(expectedLines[i], actualLines[i]);
             }
         }
     }

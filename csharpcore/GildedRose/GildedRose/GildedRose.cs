@@ -14,10 +14,6 @@ namespace GildedRoseRefactoring
 
         public void UpdateQuality()
         {
-            foreach (var item in items.Where(item => item.IsDestructible && item.Quality > 0))
-            {
-                item.Quality--;
-            }
 
             for (var i = 0; i < items.Count; i++)
             {

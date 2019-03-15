@@ -1,89 +1,83 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace csharp
 {
     public class GildedRose
     {
-        IList<Item> Items;
-        public GildedRose(IList<Item> Items)
-        {
-            this.Items = Items;
-        }
+        private readonly  IList<Item> items = new List<Item>();
+
+        public GildedRose(IList<Item> items) => this.items = items;
 
         public void UpdateQuality()
         {
-            for (var i = 0; i < Items.Count; i++)
+            foreach (var item in items)
             {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+                switch (item.Name)
                 {
-                    if (Items[i].Quality > 0)
-                    {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                        {
-                            Items[i].Quality = Items[i].Quality - 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                {
-                    Items[i].SellIn = Items[i].SellIn - 1;
-                }
-
-                if (Items[i].SellIn < 0)
-                {
-                    if (Items[i].Name != "Aged Brie")
-                    {
-                        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                        }
-                    }
-                    else
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality = Items[i].Quality + 1;
-                        }
-                    }
+                    case "Sulfuras, Hand of Ragnaros":
+                        break;
+                    case "Aged Brie":
+                        HandleAgedBrie(item);
+                        break;
+                    case "Backstage passes to a TAFKAL80ETC concert":
+                        HandleBackstagePasses(item);
+                        break;
+                    case "Conjured Mana Cake":
+                        HandleConjuredManaCake(item);
+                        break;
+                    default:
+                        HandleDefault(item);
+                        break;
                 }
             }
+        }
+
+        private void HandleDefault(Item item)
+        {
+            int modifier = item.SellIn > 0 ? -1 : -2;
+
+            PassOneDay(item, modifier);
+        }
+
+        private void HandleAgedBrie(Item item)
+        {
+            int modifier = item.SellIn > 0 ? 1 : 2;
+
+            PassOneDay(item, modifier);
+        }
+
+        private void HandleBackstagePasses(Item item)
+        {
+            if (item.SellIn <= 0)
+            {
+                item.Quality = 0;
+                item.SellIn--;
+
+                return;
+            }
+
+            int modifier = 1;
+            modifier = item.SellIn <= 10 ? 2 : modifier;
+            modifier = item.SellIn <= 5 ? 3 : modifier;
+            
+            PassOneDay(item, modifier);
+        }
+
+        private void HandleConjuredManaCake(Item item)
+        {
+            int modifier = item.SellIn > 0 ? -1 : -2;
+
+            PassOneDay(item, modifier);
+        }
+
+        private void PassOneDay(Item item, int modifier)
+        {
+            item.Quality += modifier;
+            item.SellIn--;
+
+            item.Quality = Math.Max(0, item.Quality);
+            item.Quality = Math.Min(50, item.Quality);
         }
     }
 }
